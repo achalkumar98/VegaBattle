@@ -8,43 +8,43 @@ if (!jwtPass) {
     throw new Error('JWT secret key is not defined');
   }
 
-// Register User
+  const register = async (req, res) => {
+    try {
+      const { firstName, lastName, email, password, location, occupation } = req.body;
+  
+      if (!firstName || !lastName || !email || !password || !location || !occupation) {
+        return res.status(400).json({ error: 'All fields are required' });
+      }
+  
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ error: 'User already exists' });
+      }
 
- const register = async (req, res) => {
-  try {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      picturePath,
-      location,
-      occupation,
-    } = req.body;
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
+      const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        location,
+        occupation,
+      });
+  
+      // Save the user to the database
+      const savedUser = await newUser.save();
+  
+      res.status(201).json(savedUser);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  
 
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password: passwordHash,
-      picturePath,
-      location,
-      occupation,
 
-    });
-
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const login = async (req, res) => {
+ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
