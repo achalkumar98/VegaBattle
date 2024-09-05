@@ -1,28 +1,26 @@
-// src/hooks/useWebSocket.js
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 const useWebSocket = (url) => {
-  const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState(null);
-  const socketRef = useRef(null);
+  const socket = useRef(null);
 
   useEffect(() => {
-    const ws = new WebSocket(url);
-    socketRef.current = ws;
-    setSocket(ws);
+    socket.current = new WebSocket(url);
 
-    ws.onmessage = (event) => {
+    socket.current.onopen = () => console.log('WebSocket connection established');
+
+    socket.current.onmessage = (event) => {
       setMessage(event.data);
     };
 
-    return () => {
-      ws.close();
-    };
+    socket.current.onclose = () => console.log('WebSocket connection closed');
+
+    return () => socket.current.close();
   }, [url]);
 
   const sendMessage = (msg) => {
-    if (socketRef.current) {
-      socketRef.current.send(msg);
+    if (socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(msg);
     }
   };
 

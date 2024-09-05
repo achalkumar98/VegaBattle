@@ -10,9 +10,12 @@ if (!jwtPass) {
 
   const register = async (req, res) => {
     try {
-      const { firstName, lastName, email, password, location, occupation } = req.body;
+      const { name, email, password, location, occupation } = req.body;
   
-      if (!firstName || !lastName || !email || !password || !location || !occupation) {
+      // Log the received data
+      console.log("Received registration data:", { name, email, password, location, occupation });
+  
+      if (!name || !email || !password || !location || !occupation) {
         return res.status(400).json({ error: 'All fields are required' });
       }
   
@@ -20,29 +23,27 @@ if (!jwtPass) {
       if (existingUser) {
         return res.status(400).json({ error: 'User already exists' });
       }
-
+  
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-
+  
       const newUser = new User({
-        firstName,
-        lastName,
+        name,
         email,
         password: hashedPassword,
         location,
         occupation,
       });
   
-      // Save the user to the database
       const savedUser = await newUser.save();
   
       res.status(201).json(savedUser);
     } catch (err) {
+      console.error('Registration error:', err.message); // Log error message
       res.status(500).json({ error: err.message });
     }
   };
   
-
 
  const login = async (req, res) => {
   try {

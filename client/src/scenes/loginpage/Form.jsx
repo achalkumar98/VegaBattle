@@ -10,12 +10,9 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setLogin } from "../../state";
 
 const registerSchema = yup.object().shape({
-  firstName: yup.string().required("required"),
-  lastName: yup.string().required("required"),
+  name: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
   location: yup.string().required("required"),
@@ -28,8 +25,7 @@ const loginSchema = yup.object().shape({
 });
 
 const initialValuesRegister = {
-  firstName: "",
-  lastName: "",
+  name: "",
   email: "",
   password: "",
   location: "",
@@ -43,8 +39,8 @@ const initialValuesLogin = {
 
 const Form = () => {
   const [pageType, setPageType] = useState("login");
+  const [user, setUser] = useState(null);
   const { palette } = useTheme();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
@@ -52,26 +48,34 @@ const Form = () => {
 
   const register = async (values, onSubmitProps) => {
     const formData = new FormData();
-    for (let value in values) {
-      formData.append(value, values[value]);
-    }
-
+    formData.append('name', values.name);
+    formData.append('email', values.email);
+    formData.append('password', values.password);
+    formData.append('location', values.location);
+    formData.append('occupation', values.occupation);
+  
     console.log("Register Form Data:", Object.fromEntries(formData.entries()));
-
-    const savedUserResponse = await fetch(
-      "http://localhost:3001/auth/register",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+  
+    const savedUserResponse = await fetch("http://localhost:3001/auth/register", {
+      method: "POST",
+      body: formData,
+    });
+  
+    if (!savedUserResponse.ok) {
+      console.error('Failed to register:', await savedUserResponse.text());
+      return;
+    }
+  
     const savedUser = await savedUserResponse.json();
     onSubmitProps.resetForm();
-
+  
     if (savedUser) {
       setPageType("login");
     }
   };
+  
+  
+  
 
   const login = async (values, onSubmitProps) => {
     console.log("Login Form Data:", values);
@@ -84,12 +88,10 @@ const Form = () => {
     const loggedIn = await loggedInResponse.json();
     onSubmitProps.resetForm();
     if (loggedIn) {
-      dispatch(
-        setLogin({
-          user: loggedIn.user,
-          token: loggedIn.token,
-        })
-      );
+      setUser({
+        user: loggedIn.user,
+        token: loggedIn.token,
+      });
       navigate("/home");
     }
   };
@@ -127,26 +129,14 @@ const Form = () => {
             {isRegister && (
               <>
                 <TextField
-                  label="First Name"
+                  label="Name"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.firstName || ""}
-                  name="firstName"
-                  error={
-                    Boolean(touched.firstName) && Boolean(errors.firstName)
-                  }
-                  helperText={touched.firstName && errors.firstName}
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
-                  label="Last Name"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.lastName || ""}
-                  name="lastName"
-                  error={Boolean(touched.lastName) && Boolean(errors.lastName)}
-                  helperText={touched.lastName && errors.lastName}
-                  sx={{ gridColumn: "span 2" }}
+                  value={values.name || ""}
+                  name="name"
+                  error={Boolean(touched.name) && Boolean(errors.name)}
+                  helperText={touched.name && errors.name}
+                  sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
                   label="Location"

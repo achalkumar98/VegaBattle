@@ -1,18 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { startBattle } = require('../controllers/battleController'); 
+const battleController = require('../controllers/battleController');
 
-
-
-
-router.post("/start",startBattle,()=>{console.log("Battle started")});
+router.post('/match/:username', battleController.matchUsers);
+router.post('/submit', battleController.submitAnswer);
 
 module.exports = router;
-
-
-
-// Define your routes
-router.post('/start', startBattle);
-
-module.exports = router;
-

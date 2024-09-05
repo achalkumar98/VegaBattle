@@ -1,75 +1,65 @@
 const WebSocket = require('ws');
-const clients = new Map();
-const waitingQueue = []; // Queue for matchmaking
 
-const setupWebSocketServer = (server) => {
-    const wss = new WebSocket.Server({ server });
+module.exports = (server) => {
+  const wss = new WebSocket.Server({ server });
 
-    wss.on('connection', (ws, req) => {
-        const id = Date.now();
-        const username = new URL(req.url, `http://${req.headers.host}`).searchParams.get('username');
-        clients.set(id, { ws, username, isInBattle: false });
-        console.log(`Client connected with ID: ${id} and username: ${username}`);
+  const clients = new Map();
 
-        // Check if a user is ready to be matched
-        waitingQueue.push(id);
+  wss.on('connection', (ws) => {
+    console.log('New client connected');
 
-        // Try to match with another user
-        if (waitingQueue.length >= 2) {
-            const user1Id = waitingQueue.shift();
-            const user2Id = waitingQueue.shift();
-            startBattle(user1Id, user2Id);
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message);
+
+        switch (data.type) {
+          case 'register':
+            clients.set(data.username, ws);
+            ws.username = data.username;
+            console.log(`User registered: ${data.username}`);
+            break;
+
+          case 'battleRequest':
+            handleBattleRequest(data.username);
+            break;
+
+          case 'submitAnswer':
+            handleAnswerSubmission(data);
+            break;
+
+          default:
+            console.log('Unknown message type:', data.type);
         }
-
-        ws.on('message', (message) => {
-            console.log(`Received message from ${username || id}: ${message}`);
-            // Broadcast to both users in a battle
-            const battle = getBattleForUser(id);
-            if (battle) {
-                battle.forEach(clientId => {
-                    const client = clients.get(clientId);
-                    if (client && client.ws.readyState === WebSocket.OPEN) {
-                        client.ws.send(JSON.stringify({ from: username, message }));
-                    }
-                });
-            }
-        });
-
-        ws.on('close', () => {
-            clients.delete(id);
-            console.log(`Client disconnected with ID: ${id} and username: ${username}`);
-            // Remove from waitingQueue if still present
-            const index = waitingQueue.indexOf(id);
-            if (index > -1) {
-                waitingQueue.splice(index, 1);
-            }
-        });
+      } catch (err) {
+        console.error('Error parsing message:', err);
+      }
     });
 
-    const startBattle = (user1Id, user2Id) => {
-        const user1 = clients.get(user1Id);
-        const user2 = clients.get(user2Id);
+    ws.on('close', () => {
+      if (ws.username) {
+        clients.delete(ws.username);
+        console.log(`User disconnected: ${ws.username}`);
+      }
+    });
+  });
 
-        if (user1 && user2) {
-            user1.isInBattle = true;
-            user2.isInBattle = true;
+  const handleBattleRequest = (username) => {
+    console.log(`Handling battle request for ${username}`);
+    // Add your matching logic here
+  };
 
-            user1.ws.send(JSON.stringify({ type: 'battle_start', opponent: user2.username }));
-            user2.ws.send(JSON.stringify({ type: 'battle_start', opponent: user1.username }));
+  const handleAnswerSubmission = (data) => {
+    const { battleId, username, answer } = data;
+    console.log(`Answer submission by ${username} for battle ${battleId}`);
+    // Add your answer submission logic here
+  };
 
-            console.log(`Battle started between ${user1.username} and ${user2.username}`);
-        }
+  const notifyUser = (username, message) => {
+    const client = clients.get(username);
+    if (client && client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(message));
     }
+  };
 
-    const getBattleForUser = (userId) => {
-        // Find if the user is in a battle
-        for (const [id, client] of clients.entries()) {
-            if (client.isInBattle && id !== userId) {
-                return [id, userId];
-            }
-        }
-        return null;
-    }
+  return { clients, notifyUser };
 };
-
-module.exports = { setupWebSocketServer };

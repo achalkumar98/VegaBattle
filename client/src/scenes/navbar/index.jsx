@@ -1,5 +1,5 @@
-import { useState } from "react";
-import React from "react";
+import { useState } from 'react';
+import React from 'react';
 import {
   Box,
   IconButton,
@@ -8,56 +8,46 @@ import {
   Select,
   MenuItem,
   FormControl,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+} from '@mui/material';
 import {
-  Search,
-  Message,
-  DarkMode,
-  LightMode,
-  Notifications,
   Help,
-  Menu,
   Close,
   Person,
-  CallSplit,
   EmojiEvents,
   Tv,
   MilitaryTech,
-} from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout } from "../../state";
-import { useNavigate } from "react-router-dom";
-import FlexBetween from "../../components/FlexBetween";
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import FlexBetween from '../../components/FlexBetween';
+import { useUserContext } from '../../UserContext'; // Adjust path if necessary
 
 const NavBar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
-  const dispatch = useDispatch();
+  const { user, logout } = useUserContext();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
-  const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-  const theme = useTheme();
-  const neutralLight = theme.palette.neutral.light;
-  const dark = theme.palette.neutral.dark;
-  const background = theme.palette.background.default;
-  const primaryLight = theme.palette.primary.light;
-  const alt = theme.palette.background.alt;
-  // console.log(user.firstName);
-  // const fullName = `${user?.firstName} ${user?.lastName}`;
-  const fullName = "harsh";
+  const isNonMobileScreens = window.innerWidth >= 1000; // Simple media query check
+
+  // Static color values
+  const primaryColor = '#1976d2'; // Blue color for primary
+  const neutralLight = '#f5f5f5'; // Light gray for background
+  const dark = '#333'; // Dark gray for text
+  const background = '#ffffff'; // White background
+  const alt = '#e0e0e0'; // Light gray background for navbar
+
+  const fullName = user ? `${user.firstName} ${user.lastName}` : 'Guest';
+
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
       <FlexBetween gap="1.75rem">
         <Typography
           fontWeight="bold"
           fontSize="clamp(1rem,2rem,2.25rem)"
-          color="primary"
-          onClick={() => navigate("/home")}
+          color={primaryColor}
+          onClick={() => navigate('/home')}
           sx={{
-            "&:hover": {
-              color: primaryLight,
-              cursor: "pointer",
+            '&:hover': {
+              color: '#0d47a1', // Darker shade for hover effect
+              cursor: 'pointer',
             },
           }}
         >
@@ -68,40 +58,36 @@ const NavBar = () => {
       {/* Desktop Nav */}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
-          <IconButton onClick={() => dispatch(setMode())}>
-            {theme.palette.mode === "dark" ? (
-              <DarkMode sx={{ fontSize: "25px" }} />
-            ) : (
-              <LightMode sx={{ color: dark, fontSize: "25px" }} />
-            )}
+          <IconButton>
+            <Help sx={{ fontSize: '25px', color: dark }} />
           </IconButton>
           <EmojiEvents
-            onClick={() => navigate("/home")}
-            sx={{ fontSize: "25px" }}
+            onClick={() => navigate('/home')}
+            sx={{ fontSize: '25px', color: dark }}
           />
           <Person
-            onClick={() => navigate("/profile")}
-            sx={{ fontSize: "25px" }}
+            onClick={() => navigate('/profile')}
+            sx={{ fontSize: '25px', color: dark }}
           />
-          <Tv onClick={() => navigate("/contest")} sx={{ fontSize: "25px" }} />
+          <Tv onClick={() => navigate('/contest')} sx={{ fontSize: '25px', color: dark }} />
           <MilitaryTech
-            onClick={() => navigate("/opportunity")}
-            sx={{ fontSize: "25px" }}
+            onClick={() => navigate('/opportunity')}
+            sx={{ fontSize: '25px', color: dark }}
           />
-          <Help sx={{ fontSize: "25px" }} />
+          <Help sx={{ fontSize: '25px', color: dark }} />
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}
               sx={{
                 backgroundColor: neutralLight,
-                width: "150px",
-                borderRadius: "0.25rem",
-                p: "0.25rem 1 rem",
-                "& .MuiSvgIcon-root": {
-                  pr: "0.25rem",
-                  width: "3rem",
+                width: '150px',
+                borderRadius: '0.25rem',
+                p: '0.25rem 1 rem',
+                '& .MuiSvgIcon-root': {
+                  pr: '0.25rem',
+                  width: '3rem',
                 },
-                "& .MuiSelect-select:focus": {
+                '& .MuiSelect-select:focus': {
                   backgroundColor: neutralLight,
                 },
               }}
@@ -110,14 +96,16 @@ const NavBar = () => {
               <MenuItem value={fullName}>
                 <Typography>{fullName}</Typography>
               </MenuItem>
-              <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
+              <MenuItem onClick={logout}>Log Out</MenuItem>
             </Select>
           </FormControl>
         </FlexBetween>
       ) : (
         <IconButton
           onClick={() => setIsMobileMenuToggled(!isMobileMenuToggled)}
-        ></IconButton>
+        >
+          <Help sx={{ fontSize: '25px', color: dark }} />
+        </IconButton>
       )}
 
       {/* Mobile Nav */}
@@ -137,7 +125,7 @@ const NavBar = () => {
             <IconButton
               onClick={() => setIsMobileMenuToggled(!isMobileMenuToggled)}
             >
-              <Close />
+              <Close sx={{ color: dark }} />
             </IconButton>
           </Box>
 
@@ -149,47 +137,39 @@ const NavBar = () => {
             alignItems="center"
             gap="2rem"
           >
-            <IconButton
-              onClick={() => dispatch(setMode())}
-              sx={{ fontSize: "25px" }}
-            >
-              {theme.palette.mode === "dark" ? (
-                <DarkMode sx={{ fontSize: "25px" }} />
-              ) : (
-                <LightMode sx={{ color: dark, fontSize: "25px" }} />
-              )}
+            <IconButton>
+              <Help sx={{ fontSize: '25px', color: dark }} />
             </IconButton>
             <EmojiEvents
-              onClick={() => navigate("/home")}
-              sx={{ fontSize: "25px" }}
+              onClick={() => navigate('/home')}
+              sx={{ fontSize: '25px', color: dark }}
             />
             <Person
-              onClick={() => navigate("/profile")}
-              sx={{ fontSize: "25px" }}
+              onClick={() => navigate('/profile')}
+              sx={{ fontSize: '25px', color: dark }}
             />
             <Tv
-              onClick={() => navigate("/contest")}
-              sx={{ fontSize: "25px" }}
+              onClick={() => navigate('/contest')}
+              sx={{ fontSize: '25px', color: dark }}
             />
             <MilitaryTech
-              onClick={() => navigate("/opportunity")}
-              sx={{ fontSize: "25px" }}
+              onClick={() => navigate('/opportunity')}
+              sx={{ fontSize: '25px', color: dark }}
             />
-
-            <Help sx={{ fontSize: "25px" }} />
+            <Help sx={{ fontSize: '25px', color: dark }} />
             <FormControl variant="standard" value={fullName}>
               <Select
                 value={fullName}
                 sx={{
                   backgroundColor: neutralLight,
-                  width: "150px",
-                  borderRadius: "0.25rem",
-                  p: "0.25rem 1 rem",
-                  "& .MuiSvgIcon-root": {
-                    pr: "0.25rem",
-                    width: "3rem",
+                  width: '150px',
+                  borderRadius: '0.25rem',
+                  p: '0.25rem 1 rem',
+                  '& .MuiSvgIcon-root': {
+                    pr: '0.25rem',
+                    width: '3rem',
                   },
-                  "& .MuiSelect-select:focus": {
+                  '& .MuiSelect-select:focus': {
                     backgroundColor: neutralLight,
                   },
                 }}
@@ -198,8 +178,8 @@ const NavBar = () => {
                 <MenuItem value={fullName}>
                   <Typography>{fullName}</Typography>
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(setLogout())}>
-                  LogOut
+                <MenuItem onClick={logout}>
+                  Log Out
                 </MenuItem>
               </Select>
             </FormControl>

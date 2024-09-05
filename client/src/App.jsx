@@ -1,37 +1,24 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
-import { useMemo } from "react";
-import { useSelector } from "react-redux";
-import { CssBaseline, ThemeProvider } from "@mui/material";
-import { createTheme } from "@mui/material/styles";
-import { themeSettings } from "./theme";
-import HomePage from "../src/scenes/homepage";
-import LoginPage from "../src/scenes/loginpage";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import BattlePage from '../src/scenes/battlepage'; // Ensure the correct path
+import HomePage from '../src/scenes/homepage'; // Example HomePage component
+import Login from '../src/scenes/loginpage'; // Import the Login component
+import { useUserContext } from './UserContext'; // Import the user context
 
-function App() {
-  const mode = useSelector((state) => state.mode);
-  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-  const isAuth = Boolean(useSelector((state) => state.token));
+const App = () => {
+  const { user } = useUserContext(); // Access user context
 
   return (
-    <div className="app">
-
-    <BrowserRouter>
-    <ThemeProvider theme={theme}>
-      <CssBaseline/>
+    <Router>
       <Routes>
-        {/* <Route path="/" element={<LoginPage />} />
-        <Route
-            path="/home"
-            element={isAuth ? <HomePage /> : <Navigate to="/" />}
-          /> */}
-
-          <Route path="/" element={<HomePage />} />
-        
+        {/* Redirect to homepage if user is authenticated */}
+        <Route path="/" element={user ? <Navigate to="/home" /> : <Login />} />
+        <Route path="/home" element={user ? <HomePage /> : <Navigate to="/" />} />
+        <Route path="/battle-arena" element={user ? <BattlePage /> : <Navigate to="/" />} />
+        {/* <Route path="*" element={<NotFoundPage />} /> */}
       </Routes>
-      </ThemeProvider>
-    </BrowserRouter>
-  </div>
+    </Router>
   );
-}
+};
 
 export default App;
