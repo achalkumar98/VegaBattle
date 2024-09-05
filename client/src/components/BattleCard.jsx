@@ -10,30 +10,30 @@ import {
 } from '@mui/material';
 import { Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Make sure to install axios if you use it
+import axios from 'axios'; 
 
 const BattleCard = ({ user, opponent }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  // State to manage battle connection status
+  
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
 
-  // Function to handle the start of the battle
+
   const handleStartBattle = async () => {
     setIsConnecting(true);
     setConnectionError(null);
 
     try {
-      // Replace with your actual API endpoint and request
+     
       const response = await axios.post(`http://localhost:3001/battle/match/${user.username}`, {
         player1: user.username,
         player2: opponent.username,
       });
 
       if (response.status === 200) {
-        // Navigate to the Battle Arena page if the request is successful
+      
         navigate('/battle-arena');
       } else {
         throw new Error('Failed to start the battle');

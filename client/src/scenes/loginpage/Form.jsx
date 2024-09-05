@@ -95,7 +95,7 @@ const Form = () => {
     onSubmitProps.resetForm();
   
     if (loggedIn) {
-      // Navigate to home page
+     
       navigate("/home");
     }
   };

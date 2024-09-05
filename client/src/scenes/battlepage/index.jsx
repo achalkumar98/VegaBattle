@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import BattleCard from '../../components/BattleCard'; // Ensure the correct path
-import BattleQuestion from '../../components/BattleQuestions'; // Ensure the correct path
-import useWebSocket from '../../hooks/useWebSocket'; // Ensure the correct path
+import BattleCard from '../../components/BattleCard'; 
+import BattleQuestion from '../../components/BattleQuestions'; 
+import useWebSocket from '../../hooks/useWebSocket'; 
 
 const BattlePage = () => {
-  // Example user and opponent data
+ 
   const user = { name: 'Player 1' };
   const opponent = { name: 'Player 2' };
 
@@ -17,7 +17,7 @@ const BattlePage = () => {
   useEffect(() => {
     if (message) {
       const parsedMessage = JSON.parse(message);
-      // Handle the parsed message
+      //TODO Handle the parsed message
     }
   }, [message]);
 

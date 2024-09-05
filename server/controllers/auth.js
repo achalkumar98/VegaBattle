@@ -12,7 +12,7 @@ if (!jwtPass) {
     try {
       const { name, email, password, location, occupation } = req.body;
   
-      // Log the received data
+      
       console.log("Received registration data:", { name, email, password, location, occupation });
   
       if (!name || !email || !password || !location || !occupation) {
@@ -39,7 +39,7 @@ if (!jwtPass) {
   
       res.status(201).json(savedUser);
     } catch (err) {
-      console.error('Registration error:', err.message); // Log error message
+      console.error('Registration error:', err.message); 
       res.status(500).json({ error: err.message });
     }
   };

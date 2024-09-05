@@ -9,7 +9,7 @@ const BattleArena = ({ user, opponent }) => {
 
   useEffect(() => {
     if (message) {
-      // Handle incoming messages (e.g., opponent found, question assigned, battle updates)
+
       const data = JSON.parse(message);
       
       if (data.question) {
@@ -22,7 +22,7 @@ const BattleArena = ({ user, opponent }) => {
   }, [message]);
 
   useEffect(() => {
-    // Send a message to find an opponent when the component mounts
+   
     sendMessage(JSON.stringify({ type: 'findOpponent', user: user.name }));
   }, [sendMessage, user.name]);
 

@@ -11,7 +11,7 @@ const ThemeProvider = ({ children }) => {
     setThemeMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
-  // Memoize the theme to avoid unnecessary re-renders
+ 
   const theme = useMemo(() => createTheme(themeSettings(themeMode)), [themeMode]);
 
   return (
