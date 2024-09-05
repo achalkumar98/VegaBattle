@@ -88,6 +88,7 @@ const BattleCard = ({ user, opponent }) => {
         //   alignItems="center"
           marginTop="1rem"
           sx={{ color: theme.palette.background.default }}
+          onClick={() => navigate("/battle")}
         >
           Battle
         </Typography>

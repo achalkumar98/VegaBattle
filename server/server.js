@@ -1,21 +1,20 @@
 const express = require('express');
-const app = express();
-const cors = require('cors'); 
 const mongoose = require('mongoose');
+const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const register = require('./controllers/auth');
+const { setupWebSocketServer } = require('./services/websocketService');
 const authRoutes = require('./routes/auth');
-const {register}= require('./controllers/auth');
-const verifyToken = require('./middlewares/auth');
-const { fileURLToPath } = require('url');
-const path = require('path');
+const battleRoutes = require('../server/routes/battleRoutes');
 require('dotenv').config();
+
 const port = process.env.PORT || 6000;
 const mongoURL = process.env.MONGO_URL;
 
-
-
+// Express application
+const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
@@ -27,27 +26,25 @@ app.use(cors());
 
 
 
-//Routes with files
-
-app.post("/auth/register",register);
-
-
-//Routes
-
+// HTTP Routes
+// app.post("/auth/register", register);
 app.use("/auth", authRoutes);
+app.use("/battle", battleRoutes);
 
+// MongoDB
+mongoose.connect(mongoURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('Connected to MongoDB');
+    // Start HTTP server
+    const server = app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
 
-// Mongoose setup
+    // Setup WebSocket server
+    setupWebSocketServer(server);
 
-
-mongoose.connect(process.env.MONGO_URL,{
-    useNewUrlParser:true,
-    useUnifiedTopology:true,
-}).then(()=>{
-    app.listen(port,()=> console.log(`Server Port: ${port}` ));
-
-    // User.insertMany(users);
-    // Post.insertMany(posts);
-}).catch((err)=>{
-    console.log(err,"did not connected");
+}).catch((err) => {
+    console.log(err, "Failed to connect to MongoDB");
 });

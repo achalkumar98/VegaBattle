@@ -31,6 +31,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
     "multer-gridfs-storage": "^5.0.2",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "ws": "^8.18.0"
   }
 }
