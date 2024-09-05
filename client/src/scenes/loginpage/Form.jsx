@@ -79,19 +79,23 @@ const Form = () => {
 
   const login = async (values, onSubmitProps) => {
     console.log("Login Form Data:", values);
-
+  
     const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),
     });
+  
+    if (!loggedInResponse.ok) {
+      console.error('Failed to log in:', await loggedInResponse.text());
+      return;
+    }
+  
     const loggedIn = await loggedInResponse.json();
     onSubmitProps.resetForm();
+  
     if (loggedIn) {
-      setUser({
-        user: loggedIn.user,
-        token: loggedIn.token,
-      });
+      // Navigate to home page
       navigate("/home");
     }
   };
