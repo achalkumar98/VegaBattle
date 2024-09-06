@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema(
             min: 5,
             max: 50,
         },
+        battlesWon: {
+            type: Number,
+            default: 0,
+          },
         location: String,
         occupation: String,
     },

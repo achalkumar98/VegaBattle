@@ -20,6 +20,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import FlexBetween from '../../components/FlexBetween';
 import { useUserContext } from '../../UserContext';
+import MetaMaskWallet from '../../components/MetaMaskWallet';
 
 const NavBar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -34,6 +35,7 @@ const NavBar = () => {
   const alt = '#e0e0e0';
 
   const fullName = user ? `${user.firstName} ${user.lastName}` : 'Guest';
+  const userId = user ? user._id : ''; // Extract user ID
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -59,12 +61,13 @@ const NavBar = () => {
           <IconButton>
             <Help sx={{ fontSize: '25px', color: dark }} />
           </IconButton>
+          <MetaMaskWallet />
           <EmojiEvents
             onClick={() => navigate('/home')}
             sx={{ fontSize: '25px', color: dark }}
           />
           <Person
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate(`/profile/${userId}`)} // Navigate to profile page
             sx={{ fontSize: '25px', color: dark }}
           />
           <Tv onClick={() => navigate('/contest')} sx={{ fontSize: '25px', color: dark }} />
@@ -140,7 +143,7 @@ const NavBar = () => {
               sx={{ fontSize: '25px', color: dark }}
             />
             <Person
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate(`/profile/${userId}`)} // Navigate to profile page
               sx={{ fontSize: '25px', color: dark }}
             />
             <Tv

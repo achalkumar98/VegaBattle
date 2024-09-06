@@ -6,6 +6,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer'); 
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profileRoutes');
+const userRoutes = require('./routes/users');
 const { matchUsers, submitAnswer } = require('./controllers/battleController');
 require('dotenv').config();
 
@@ -13,7 +15,9 @@ const app = express();
 const port = process.env.PORT || 6000;
 const mongoURL = process.env.MONGO_URL;
 
-const upload = multer(); 
+const upload = multer(
+  
+); 
 
 
 app.use(express.json());
@@ -25,8 +29,9 @@ app.use(cors());
 
 
 app.use('/auth', upload.none(), authRoutes); 
-app.post('/battle/match/:username', matchUsers);
-app.post('/battle/submit', submitAnswer);
+app.use('/profile', profileRoutes);
+app.use('/users', userRoutes);
+
 
 
 mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -38,7 +43,5 @@ mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
       console.log(`HTTP server running on http://localhost:${port}`);
     });
 
-  
-    require('./services/websocketService'); // Ensure this file is correctly referenced and exports the WebSocket server logic
   })
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
